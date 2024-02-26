@@ -1,3 +1,4 @@
+import copy
 import queue
 import math
 
@@ -144,8 +145,16 @@ def depth_limited_search(start_state, max_depth):
 
         for action in actions:
             next_state = state_transition(_state, action)
-            # Only consider actions that cause a change to the state
-            if _state != next_state:
+
+            next_copy = copy.deepcopy(next_state)
+            current_copy = copy.deepcopy(_state)
+            del next_copy["time"]
+            del current_copy["time"]
+
+            # Only consider actions that ...
+            # Take a smaller amount of time than the best current solution
+            # AND causes a change to the state (disregarding time)
+            if next_state["time"] < best["time"] and next_copy != current_copy:
                 new = (_plan + [action]), next_state, _depth + 1
                 to_visit.put(new)
 
@@ -153,7 +162,7 @@ def depth_limited_search(start_state, max_depth):
 
 
 def plan(start_state):
-    return depth_limited_search(start_state, 7)
+    return depth_limited_search(start_state, 10)
 
 
 # this is a test function. It tests your plan function 
