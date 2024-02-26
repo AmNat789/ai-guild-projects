@@ -120,6 +120,7 @@ def breath_first_search(start_state):
             new_state = (_plan + [action]), state_transition(_state, action)
             to_visit.put(new_state)
 
+
 def depth_limited_search(start_state, max_depth):
     to_visit = queue.Queue()
     first = ([], start_state, 0)
@@ -137,7 +138,7 @@ def depth_limited_search(start_state, max_depth):
             best["plan"] = _plan
             best["time"] = _state["time"]
 
-        if _depth+1 > max_depth:
+        if _depth + 1 > max_depth:
             break
 
         for action in actions:
