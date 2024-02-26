@@ -117,8 +117,8 @@ def breath_first_search(start_state):
             return _plan
 
         for action in actions:
-            new_state = (_plan + [action]), state_transition(_state, action)
-            to_visit.put(new_state)
+            new = (_plan + [action]), state_transition(_state, action)
+            to_visit.put(new)
 
 
 def depth_limited_search(start_state, max_depth):
@@ -138,12 +138,16 @@ def depth_limited_search(start_state, max_depth):
             best["plan"] = _plan
             best["time"] = _state["time"]
 
+        # Only iterate to a max depth of the tree
         if _depth + 1 > max_depth:
             break
 
         for action in actions:
-            new_state = (_plan + [action]), state_transition(_state, action), _depth + 1
-            to_visit.put(new_state)
+            next_state = state_transition(_state, action)
+            # Only consider actions that cause a change to the state
+            if _state != next_state:
+                new = (_plan + [action]), next_state, _depth + 1
+                to_visit.put(new)
 
     return best["plan"]
 
