@@ -1,4 +1,5 @@
 import queue
+import math
 
 #############################################
 # Here's the set of actions. They have the following meaning:
@@ -119,11 +120,35 @@ def breath_first_search(start_state):
             new_state = (_plan + [action]), state_transition(_state, action)
             to_visit.put(new_state)
 
+def depth_limited_search(start_state, max_depth):
+    to_visit = queue.Queue()
+    first = ([], start_state, 0)
+    to_visit.put(first)
+
+    best = {
+        "plan": [],
+        "time": math.inf
+    }
+
+    while to_visit.qsize() > 0:
+        _plan, _state, _depth = to_visit.get()
+
+        if goal(_state) and _state["time"] < best["time"]:
+            best["plan"] = _plan
+            best["time"] = _state["time"]
+
+        if _depth+1 > max_depth:
+            break
+
+        for action in actions:
+            new_state = (_plan + [action]), state_transition(_state, action), _depth + 1
+            to_visit.put(new_state)
+
+    return best["plan"]
+
 
 def plan(start_state):
-    # TODO: implement me!
-
-    return breath_first_search(start_state)
+    return depth_limited_search(start_state, 7)
 
 
 # this is a test function. It tests your plan function 
