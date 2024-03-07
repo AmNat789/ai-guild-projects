@@ -9,6 +9,7 @@
 
 import math
 
+
 ################################################################################
 # the function you are supposed to optimize.
 # It has the following input:
@@ -17,7 +18,7 @@ import math
 #  toaster: the number of the toaster you want to use. It's supposed to be an integer, between 1 and 10.
 #  power: how much power the toaster has (it's supposed to be a floating point number between 0 and 2)
 ################################################################################
-def utility(toast_duration, wait_duration, power = 1.0,toaster = 1):
+def utility(toast_duration, wait_duration, power=1.0, toaster=1):
     # handle input errors
     if (not type(toast_duration) is int) and not (1 <= toast_duration <= 100):
         raise ValueError("toast_duration is not an integer")
@@ -29,17 +30,17 @@ def utility(toast_duration, wait_duration, power = 1.0,toaster = 1):
         raise ValueError("power is not a float or not in the valid range")
 
     # get toaster specific configuration
-    hpt = [10,8,15,7,9,2,9,19,92,32][toaster-1]
-    hpw = [1,4,19,3,20,3,1,4,1,62][toaster-1]
-    toaster_utility = [1,0.9,0.7,1.3,0.3,0.8,0.5,0.8,3,0.2][toaster-1]
+    hpt = [10, 8, 15, 7, 9, 2, 9, 19, 92, 32][toaster - 1]
+    hpw = [1, 4, 19, 3, 20, 3, 1, 4, 1, 62][toaster - 1]
+    toaster_utility = [1, 0.9, 0.7, 1.3, 0.3, 0.8, 0.5, 0.8, 3, 0.2][toaster - 1]
 
     # calculate values
-    toast_utility = -0.1*(toast_duration-hpt)**2+1
-    wait_utility = -0.01*(wait_duration-hpw)**2+1
+    toast_utility = -0.1 * (toast_duration - hpt) ** 2 + 1
+    wait_utility = -0.01 * (wait_duration - hpw) ** 2 + 1
     overall_utility = (toast_utility + wait_utility) * toaster_utility
 
     # apply modifier based on electricity
-    power_factor = math.sin(10*power+math.pi/2 -10) + power*0.2
+    power_factor = math.sin(10 * power + math.pi / 2 - 10) + power * 0.2
     overall_utility *= power_factor
 
     return overall_utility
@@ -75,10 +76,55 @@ def utility(toast_duration, wait_duration, power = 1.0,toaster = 1):
 #    - find the optimum for all four parameters
 #    - define your own algorithm!
 def find_maximum():
-    # TODO: Implement an optimization algorithm. Tip: (1,1) is not the optimum!
-    return (1,1)
+    return hill_climbing()
+
+
+# easy task
+def exhaustive_search():
+    max_score = -math.inf
+    best_params = (1, 1)
+
+    for toast_duration in range(1, 101):
+        for wait_duration in range(1, 101):
+            score = utility(toast_duration, wait_duration)
+            if score > max_score:
+                best_params = (toast_duration, wait_duration)
+                max_score = score
+
+    return best_params
+
+
+# medium task
+def hill_climbing():
+    current_solution = (1, 1)
+
+    while True:
+
+        # Calculate the highest neighbor
+        next_solution = None
+        best_neighbor_score = -math.inf
+
+        for i, val in enumerate(current_solution):
+            neighbor = list(current_solution)
+            for change in [-1, 1]:
+                neighbor[i] = val + change
+
+            try:
+                neighbor_score = utility(*neighbor)
+                if neighbor_score > best_neighbor_score:
+                    best_neighbor_score = neighbor_score
+                    next_solution = neighbor
+            except ValueError:
+                continue
+
+        if best_neighbor_score > utility(*current_solution):
+            current_solution = next_solution
+        else:
+            break
+
+    return tuple(current_solution)
 
 # use the function and see what it thinks the optimum is
 optimum = find_maximum()
-print("Optimum:",optimum,)
-print("value:",utility(*optimum))
+print("Optimum:", optimum, )
+print("value:", utility(*optimum))
